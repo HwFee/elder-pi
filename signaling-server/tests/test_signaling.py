@@ -1,9 +1,11 @@
 import pytest
 import socketio
+from datetime import datetime, timedelta
 from httpx import AsyncClient, ASGITransport
 
 from app.db import async_engine, Base
 from app.main import app
+from app.socket.manager import manager
 from app.socket.namespace import SignalingNamespace
 
 
@@ -92,3 +94,46 @@ async def test_socket_rejects_missing_token(client):
 async def test_socket_app_exposed():
     from app.main import socket_app
     assert socket_app is not None
+
+
+async def test_heartbeat_re_registers_after_stale_sweep(client):
+    manager._sid_to_device.clear()
+    manager._device_to_sids.clear()
+    manager._last_seen.clear()
+
+    await client.post("/api/auth/register", json={
+        "email": "alice@example.com", "password": "secret", "full_name": "Alice"
+    })
+    r = await client.post("/api/auth/login", data={"username": "alice@example.com", "password": "secret"})
+    headers = {"Authorization": f"Bearer {r.json()['access_token']}"}
+
+    r = await client.post("/api/devices", json={"display_name": "Pi"}, headers=headers)
+    device_token = r.json()["device_token"]
+
+    ns = SignalingNamespace("/signaling")
+    sessions = {}
+    rooms = {}
+
+    async def save_session(sid, session):
+        sessions[sid] = session
+
+    async def get_session(sid):
+        return sessions.get(sid, {})
+
+    async def enter_room(sid, room):
+        rooms.setdefault(sid, set()).add(room)
+
+    ns.save_session = save_session
+    ns.get_session = get_session
+    ns.enter_room = enter_room
+
+    await ns.on_connect("test-sid", {}, {"token": device_token})
+    device_id = sessions["test-sid"]["device_id"]
+
+    manager._last_seen[device_id] = datetime.utcnow() - timedelta(seconds=120)
+    manager.sweep_stale(timeout_seconds=60)
+    assert manager.is_online(device_id) is False
+
+    await ns.on_presence_heartbeat("test-sid", {})
+    assert manager.is_online(device_id) is True
+    assert manager._sid_to_device["test-sid"] == device_id

@@ -19,7 +19,7 @@ class ConnectionManager:
             sids = self._device_to_sids.get(device_id, set())
             sids.discard(sid)
             if not sids:
-                del self._device_to_sids[device_id]
+                self._device_to_sids.pop(device_id, None)
 
     def is_online(self, device_id: str) -> bool:
         return device_id in self._device_to_sids and len(self._device_to_sids[device_id]) > 0
@@ -27,8 +27,11 @@ class ConnectionManager:
     def get_last_seen(self, device_id: str) -> Optional[datetime]:
         return self._last_seen.get(device_id)
 
-    def heartbeat(self, device_id: str):
+    def heartbeat(self, device_id: str, sid: Optional[str] = None):
         self._last_seen[device_id] = datetime.utcnow()
+        if sid is not None:
+            self._sid_to_device[sid] = device_id
+            self._device_to_sids.setdefault(device_id, set()).add(sid)
 
     def get_room_for_device(self, device_id: str) -> str:
         return f"device:{device_id}"
@@ -37,7 +40,9 @@ class ConnectionManager:
         cutoff = datetime.utcnow() - timedelta(seconds=timeout_seconds)
         stale = [device_id for device_id, last_seen in self._last_seen.items() if last_seen < cutoff]
         for device_id in stale:
-            self._device_to_sids.pop(device_id, None)
+            sids = self._device_to_sids.pop(device_id, set())
+            for sid in sids:
+                self._sid_to_device.pop(sid, None)
         for device_id in stale:
             self._last_seen.pop(device_id, None)
         return stale

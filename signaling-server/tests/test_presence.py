@@ -59,6 +59,27 @@ def test_sweep_stale_marks_offline():
     assert mgr.is_online("device-1") is False
 
 
+def test_disconnect_after_sweep_is_safe():
+    mgr = ConnectionManager()
+    mgr.connect("sid-1", "device-1")
+    mgr._last_seen["device-1"] = datetime.utcnow() - timedelta(seconds=120)
+    mgr.sweep_stale(timeout_seconds=60)
+    mgr.disconnect("sid-1")
+    assert mgr.is_online("device-1") is False
+    assert "sid-1" not in mgr._sid_to_device
+
+
+def test_heartbeat_re_registers_after_sweep():
+    mgr = ConnectionManager()
+    mgr.connect("sid-1", "device-1")
+    mgr._last_seen["device-1"] = datetime.utcnow() - timedelta(seconds=120)
+    mgr.sweep_stale(timeout_seconds=60)
+    assert mgr.is_online("device-1") is False
+    mgr.heartbeat("device-1", sid="sid-1")
+    assert mgr.is_online("device-1") is True
+    assert mgr._sid_to_device["sid-1"] == "device-1"
+
+
 async def test_get_device_status(client, auth_headers):
     r = await client.post("/api/devices", json={"display_name": "Pi"}, headers=auth_headers)
     device_id = r.json()["device_id"]

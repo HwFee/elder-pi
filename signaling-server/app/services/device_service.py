@@ -1,11 +1,10 @@
-import secrets
 from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Device, User
-from app.services.auth_service import create_access_token, hash_password
+from app.services.auth_service import create_access_token
 
 
 def create_device_token(device_id: str) -> str:
@@ -13,11 +12,9 @@ def create_device_token(device_id: str) -> str:
 
 
 async def create_device(db: AsyncSession, owner: User, display_name: str) -> tuple[Device, str]:
-    device_token = secrets.token_urlsafe(32)
     device = Device(
         owner_id=owner.id,
         display_name=display_name,
-        device_token_hash=hash_password(device_token),
     )
     db.add(device)
     await db.commit()
@@ -42,6 +39,6 @@ async def verify_device_token(db: AsyncSession, device_id: str, token: str) -> O
 
     result = await db.execute(select(Device).where(Device.id == device_id))
     device = result.scalar_one_or_none()
-    if device and verify_pwd(token, device.device_token_hash):
+    if device and device.device_token_hash and verify_pwd(token, device.device_token_hash):
         return device
     return None

@@ -47,7 +47,7 @@ class SignalingNamespace(socketio.AsyncNamespace):
         session = await self.get_session(sid)
         device_id = session.get("device_id")
         if device_id:
-            manager.heartbeat(device_id)
+            manager.heartbeat(device_id, sid)
 
 
 signaling_ns = SignalingNamespace("/signaling")

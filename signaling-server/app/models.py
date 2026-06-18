@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Text, Enum, UniqueConstraint
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Text, Enum, UniqueConstraint, Index
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import relationship
 
@@ -67,3 +67,12 @@ class CallSession(Base):
     status = Column(String(20), nullable=False, default="pending")  # pending / accepted / rejected / ended
     started_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     ended_at = Column(DateTime, nullable=True)
+    __table_args__ = (
+        Index(
+            "uq_active_call_per_device",
+            "callee_device_id",
+            unique=True,
+            sqlite_where=status.in_(["pending", "accepted"]),
+            postgresql_where=status.in_(["pending", "accepted"]),
+        ),
+    )

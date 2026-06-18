@@ -388,6 +388,40 @@ async def test_second_call_returns_busy(client):
     assert busy["data"]["callId"] == "call-2"
 
 
+async def test_call_invite_catches_race_integrity_error(client, monkeypatch):
+    from app.services import call_service
+
+    owner_id, owner_token = await _register_user(client, "owner@example.com", "secret", "Owner")
+    caller_id, caller_token = await _register_user(client, "caller@example.com", "secret", "Caller")
+    device_id, _ = await _create_device(client, owner_token)
+    await client.post(
+        f"/api/devices/{device_id}/contacts",
+        json={"user_id": caller_id, "display_name": "Caller", "button_index": 1},
+        headers={"Authorization": f"Bearer {owner_token}"},
+    )
+
+    async with AsyncSessionLocal() as db:
+        await call_service.create_call_session(db, "call-1", caller_id, device_id)
+
+    async def fake_active(*args, **kwargs):
+        return None
+
+    monkeypatch.setattr(call_service, "get_active_call_for_device", fake_active)
+
+    ns, sessions, rooms, emitted = _make_namespace()
+    sessions["caller-sid"] = {"kind": "user", "user_id": caller_id, "caller_name": "Caller"}
+
+    await ns.on_call_invite("caller-sid", {
+        "callId": "call-2",
+        "toDeviceId": device_id,
+        "offer": {"sdp": "fake-offer-2"},
+    })
+
+    busy = next(e for e in emitted if e["event"] == "call:busy")
+    assert busy["room"] == "caller-sid"
+    assert busy["data"]["callId"] == "call-2"
+
+
 async def test_call_invite_rejects_missing_device(client):
     owner_id, owner_token = await _register_user(client, "owner@example.com", "secret", "Owner")
     caller_id, caller_token = await _register_user(client, "caller@example.com", "secret", "Caller")

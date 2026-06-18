@@ -2,6 +2,7 @@
 change: elder-pi-client
 design-doc: docs/superpowers/specs/2026-06-18-elder-pi-client-design.md
 base-ref: 8d3debf14fab5ad4ef099808531daca4b0ff59ad
+archived-with: 2026-06-18-elder-pi-client
 ---
 
 # elder-pi-client Implementation Plan

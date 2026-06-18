@@ -2,6 +2,8 @@
 comet_change: elder-pi-client
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-06-18-elder-pi-client
+status: final
 ---
 
 # elder-pi-client Design Doc

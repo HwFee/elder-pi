@@ -16,7 +16,7 @@ verification_report: docs/superpowers/reports/2026-06-18-elder-pi-client-verify.
 branch_status: handled
 created_at: 2026-06-18
 verified_at: 2026-06-18
-archived: false
+archived: true
 handoff_context: openspec/changes/elder-pi-client/.comet/handoff/design-context.json
 handoff_hash: 5ebb352d868fd6c731035886cc2edccdf86e8f5d2267e4247467066fae308899
 direct_override: true

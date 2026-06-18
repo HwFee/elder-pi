@@ -1,0 +1,18 @@
+{
+  "change": "video-call-signaling",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "f3ce0f556f9ac443caa4ac49183a1757e4bd2a16b7b77b135e6d972c8b299d69",
+  "files": [
+    { "path": "openspec/changes/video-call-signaling/proposal.md", "sha256": "0c340e7aba73c7e6e8d74f2a7078483ff8559de89c61b6ac6a98e4cd51735837" },
+    { "path": "openspec/changes/video-call-signaling/design.md", "sha256": "a3c5cea712d826e71be8308073dc4c1c0cd8ff9e0dc5ace4a564daee15a49be8" },
+    { "path": "openspec/changes/video-call-signaling/tasks.md", "sha256": "76042fa850698d6b9919d6f08cbae85da4914ccd6174838c17048b40e5fcd870" },
+    { "path": "openspec/changes/video-call-signaling/specs/call-signaling/spec.md", "sha256": "1ecc01bb04979b2d44634d4b3e64f5552ddbb8e3222f39a80ec46ecc919776fd" },
+    { "path": "openspec/changes/video-call-signaling/specs/contact-management/spec.md", "sha256": "c18d8e5106435c6f858f293bcae765736b517dd7ad11f0f581812c4a5bbab455" },
+    { "path": "openspec/changes/video-call-signaling/specs/presence/spec.md", "sha256": "a41b1a6dbd30e30a86c200df6b8b2e162700533fe7d89d0dc6325f8d3ab93b83" },
+    { "path": "openspec/changes/video-call-signaling/specs/user-auth/spec.md", "sha256": "5612055ada2a2edbe86a02c88eb13343697e37f6774c789d132bb14a0d08caf9" },
+    { "path": "openspec/changes/video-call-signaling/specs/whitelist/spec.md", "sha256": "80099b6345bae78120fe96a26b9af1d722caab79fa3037fc3f86672069e68364" }
+  ]
+}

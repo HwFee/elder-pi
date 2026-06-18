@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+.opencode/node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Generated / runtime
+uploads/
+*.log
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

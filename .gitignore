@@ -18,6 +18,8 @@ dist/
 build/
 .pytest_cache/
 .mypy_cache/
+signaling-server/signaling.db
+signaling-server/*.db
 
 # IDE
 .vscode/

@@ -1,12 +1,12 @@
 workflow: full
-phase: build
+phase: verify
 context_compression: off
 build_mode: direct
 build_pause: null
 subagent_dispatch: null
 tdd_mode: direct
 isolation: branch
-verify_mode: null
+verify_mode: full
 auto_transition: true
 base_ref: ffa6991bb246f7e2ca2279cb94c8cecfd731507b
 design_doc: docs/superpowers/specs/2026-06-18-elder-pi-client-design.md

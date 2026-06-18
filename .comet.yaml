@@ -1,0 +1,2 @@
+build_command: cd signaling-server && python -m compileall app/
+verify_command: cd signaling-server && SECRET_KEY=test-secret python -m pytest tests/ -v

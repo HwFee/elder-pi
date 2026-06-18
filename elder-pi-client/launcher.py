@@ -32,7 +32,7 @@ class LauncherHandler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
     def serve_index(self):
-        index_path = self.directory / "index.html"
+        index_path = Path(self.directory) / "index.html"
         if not index_path.exists():
             self.send_error(404, "index.html not found")
             return

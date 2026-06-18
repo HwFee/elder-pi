@@ -70,11 +70,24 @@ async def update_contact(
     if payload.display_name is not None:
         contact.display_name = payload.display_name
     if payload.button_index is not None:
+        existing = await db.execute(
+            select(Contact).where(
+                Contact.device_id == contact.device_id,
+                Contact.button_index == payload.button_index,
+                Contact.id != contact.id,
+            )
+        )
+        if existing.scalar_one_or_none():
+            raise ContactError("Button index already used")
         contact.button_index = payload.button_index
     if payload.avatar_path is not None:
         contact.avatar_path = payload.avatar_path
-    await db.commit()
-    await db.refresh(contact)
+    try:
+        await db.commit()
+        await db.refresh(contact)
+    except IntegrityError as exc:
+        await db.rollback()
+        raise ContactError("Contact conflicts with existing button index") from exc
     return contact
 
 

@@ -51,7 +51,13 @@ async def update_contact(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    contact = await contact_service.update_contact(db, current_user.id, contact_id, payload)
+    try:
+        contact = await contact_service.update_contact(db, current_user.id, contact_id, payload)
+    except contact_service.ContactError as exc:
+        message = str(exc)
+        if message == "Contact not found":
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=message)
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=message)
     if contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
     return contact

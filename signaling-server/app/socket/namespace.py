@@ -1,4 +1,5 @@
 import socketio
+from sqlalchemy.exc import IntegrityError, MultipleResultsFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import AsyncSessionLocal
@@ -6,6 +7,14 @@ from app.models import Device, User
 from app.services import call_service, contact_service
 from app.services.auth_service import decode_access_token
 from app.socket.manager import manager
+
+
+def _is_call_participant(session: dict, session_rec) -> bool:
+    if session.get("kind") == "device":
+        return session.get("device_id") == session_rec.callee_device_id
+    if session.get("kind") == "user":
+        return session.get("user_id") == session_rec.caller_id
+    return False
 
 
 class SignalingNamespace(socketio.AsyncNamespace):
@@ -77,6 +86,15 @@ class SignalingNamespace(socketio.AsyncNamespace):
                 )
                 return
 
+            target_device = await db.get(Device, to_device_id)
+            if target_device is None:
+                await self.emit(
+                    "call:error",
+                    {"callId": call_id, "reason": "Device not found"},
+                    room=sid,
+                )
+                return
+
             is_allowed = await contact_service.is_contact(db, to_device_id, caller_id)
             if not is_allowed:
                 await self.emit(
@@ -86,17 +104,22 @@ class SignalingNamespace(socketio.AsyncNamespace):
                 )
                 return
 
-            active = await call_service.get_active_call_for_device(db, to_device_id)
-            if active is not None and active.call_id != call_id:
+            try:
+                active = await call_service.get_active_call_for_device(db, to_device_id)
+                if active is not None and active.call_id != call_id:
+                    await self.emit("call:busy", {"callId": call_id}, room=sid)
+                    return
+
+                existing = await call_service.get_call_session(db, call_id)
+                if existing is not None and existing.status in ("pending", "accepted"):
+                    await self.emit("call:busy", {"callId": call_id}, room=sid)
+                    return
+
+                await call_service.create_call_session(db, call_id, caller_id, to_device_id)
+            except (IntegrityError, MultipleResultsFound):
                 await self.emit("call:busy", {"callId": call_id}, room=sid)
                 return
 
-            existing = await call_service.get_call_session(db, call_id)
-            if existing is not None and existing.status in ("pending", "accepted"):
-                await self.emit("call:busy", {"callId": call_id}, room=sid)
-                return
-
-            await call_service.create_call_session(db, call_id, caller_id, to_device_id)
             await self.emit(
                 "call:invite",
                 {
@@ -114,6 +137,17 @@ class SignalingNamespace(socketio.AsyncNamespace):
             session_rec = await call_service.get_call_session(db, call_id)
             if session_rec is None:
                 return
+            caller_session = await self.get_session(sid)
+            if not (
+                caller_session.get("kind") == "device"
+                and caller_session.get("device_id") == session_rec.callee_device_id
+            ):
+                await self.emit(
+                    "call:error",
+                    {"callId": call_id, "reason": "Unauthorized"},
+                    room=sid,
+                )
+                return
             await call_service.accept_call(db, call_id)
             await self.emit(
                 "call:accept",
@@ -127,6 +161,14 @@ class SignalingNamespace(socketio.AsyncNamespace):
             session_rec = await call_service.get_call_session(db, call_id)
             if session_rec is None:
                 return
+            caller_session = await self.get_session(sid)
+            if not _is_call_participant(caller_session, session_rec):
+                await self.emit(
+                    "call:error",
+                    {"callId": call_id, "reason": "Unauthorized"},
+                    room=sid,
+                )
+                return
             await call_service.reject_call(db, call_id)
             await self.emit(
                 "call:reject",
@@ -139,6 +181,14 @@ class SignalingNamespace(socketio.AsyncNamespace):
             call_id = data.get("callId")
             session_rec = await call_service.get_call_session(db, call_id)
             if session_rec is None:
+                return
+            caller_session = await self.get_session(sid)
+            if not _is_call_participant(caller_session, session_rec):
+                await self.emit(
+                    "call:error",
+                    {"callId": call_id, "reason": "Unauthorized"},
+                    room=sid,
+                )
                 return
             await call_service.end_call(db, call_id)
             await self.emit("call:end", {"callId": call_id}, room=f"user:{session_rec.caller_id}")
@@ -155,6 +205,13 @@ class SignalingNamespace(socketio.AsyncNamespace):
             if session_rec is None:
                 return
             caller_session = await self.get_session(sid)
+            if not _is_call_participant(caller_session, session_rec):
+                await self.emit(
+                    "call:error",
+                    {"callId": call_id, "reason": "Unauthorized"},
+                    room=sid,
+                )
+                return
             if caller_session.get("user_id") == session_rec.caller_id:
                 target_room = manager.get_room_for_device(session_rec.callee_device_id)
             else:

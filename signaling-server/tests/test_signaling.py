@@ -386,3 +386,101 @@ async def test_second_call_returns_busy(client):
     busy = next(e for e in emitted if e["event"] == "call:busy")
     assert busy["room"] == "caller-sid"
     assert busy["data"]["callId"] == "call-2"
+
+
+async def test_call_invite_rejects_missing_device(client):
+    owner_id, owner_token = await _register_user(client, "owner@example.com", "secret", "Owner")
+    caller_id, caller_token = await _register_user(client, "caller@example.com", "secret", "Caller")
+
+    ns, sessions, rooms, emitted = _make_namespace()
+    sessions["caller-sid"] = {"kind": "user", "user_id": caller_id, "caller_name": "Caller"}
+
+    await ns.on_call_invite("caller-sid", {
+        "callId": "call-1",
+        "toDeviceId": "does-not-exist",
+        "offer": {"sdp": "fake-offer"},
+    })
+
+    error = next(e for e in emitted if e["event"] == "call:error")
+    assert error["room"] == "caller-sid"
+    assert error["data"]["reason"] == "Device not found"
+
+
+async def test_call_accept_rejects_unauthorized_socket(client):
+    from app.services import call_service
+
+    owner_id, owner_token = await _register_user(client, "owner@example.com", "secret", "Owner")
+    caller_id, caller_token = await _register_user(client, "caller@example.com", "secret", "Caller")
+    device_id, _ = await _create_device(client, owner_token)
+
+    async with AsyncSessionLocal() as db:
+        await call_service.create_call_session(db, "call-1", caller_id, device_id)
+
+    ns, sessions, rooms, emitted = _make_namespace()
+    sessions["attacker-sid"] = {"kind": "user", "user_id": "attacker-id"}
+
+    await ns.on_call_accept("attacker-sid", {"callId": "call-1", "answer": {"sdp": "fake"}})
+
+    error = next(e for e in emitted if e["event"] == "call:error")
+    assert error["room"] == "attacker-sid"
+    assert error["data"]["reason"] == "Unauthorized"
+
+
+async def test_call_reject_rejects_unauthorized_socket(client):
+    from app.services import call_service
+
+    owner_id, owner_token = await _register_user(client, "owner@example.com", "secret", "Owner")
+    caller_id, caller_token = await _register_user(client, "caller@example.com", "secret", "Caller")
+    device_id, _ = await _create_device(client, owner_token)
+
+    async with AsyncSessionLocal() as db:
+        await call_service.create_call_session(db, "call-1", caller_id, device_id)
+
+    ns, sessions, rooms, emitted = _make_namespace()
+    sessions["attacker-sid"] = {"kind": "device", "device_id": "attacker-device"}
+
+    await ns.on_call_reject("attacker-sid", {"callId": "call-1", "reason": "nope"})
+
+    error = next(e for e in emitted if e["event"] == "call:error")
+    assert error["room"] == "attacker-sid"
+    assert error["data"]["reason"] == "Unauthorized"
+
+
+async def test_call_end_rejects_unauthorized_socket(client):
+    from app.services import call_service
+
+    owner_id, owner_token = await _register_user(client, "owner@example.com", "secret", "Owner")
+    caller_id, caller_token = await _register_user(client, "caller@example.com", "secret", "Caller")
+    device_id, _ = await _create_device(client, owner_token)
+
+    async with AsyncSessionLocal() as db:
+        await call_service.create_call_session(db, "call-1", caller_id, device_id)
+
+    ns, sessions, rooms, emitted = _make_namespace()
+    sessions["attacker-sid"] = {"kind": "user", "user_id": "attacker-id"}
+
+    await ns.on_call_end("attacker-sid", {"callId": "call-1"})
+
+    error = next(e for e in emitted if e["event"] == "call:error")
+    assert error["room"] == "attacker-sid"
+    assert error["data"]["reason"] == "Unauthorized"
+
+
+async def test_ice_candidate_rejects_unauthorized_socket(client):
+    from app.services import call_service
+
+    owner_id, owner_token = await _register_user(client, "owner@example.com", "secret", "Owner")
+    caller_id, caller_token = await _register_user(client, "caller@example.com", "secret", "Caller")
+    device_id, _ = await _create_device(client, owner_token)
+
+    async with AsyncSessionLocal() as db:
+        await call_service.create_call_session(db, "call-1", caller_id, device_id)
+
+    ns, sessions, rooms, emitted = _make_namespace()
+    sessions["attacker-sid"] = {"kind": "user", "user_id": "attacker-id"}
+
+    await ns.on_ice_candidate("attacker-sid", {"callId": "call-1", "candidate": "candidate-x"})
+
+    error = next(e for e in emitted if e["event"] == "call:error")
+    assert error["room"] == "attacker-sid"
+    assert error["data"]["reason"] == "Unauthorized"

@@ -30,6 +30,8 @@ class Device(Base):
     id = Column(String(36), primary_key=True, default=generate_uuid)
     owner_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     display_name = Column(String(255), nullable=False)
+    # Device authentication uses JWT tokens generated on creation.
+    # The device_token_hash column is retained for compatibility but is unused.
     device_token_hash = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 

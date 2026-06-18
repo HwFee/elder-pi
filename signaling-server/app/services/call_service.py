@@ -61,10 +61,12 @@ async def end_call(db: AsyncSession, call_id: str) -> Optional[CallSession]:
 
 async def get_active_call_for_device(db: AsyncSession, device_id: str) -> Optional[CallSession]:
     result = await db.execute(
-        select(CallSession).where(
+        select(CallSession)
+        .where(
             CallSession.callee_device_id == device_id,
             CallSession.status.in_(["pending", "accepted"]),
         )
+        .limit(1)
     )
     return result.scalar_one_or_none()
 

@@ -32,13 +32,3 @@ async def get_owned_device(db: AsyncSession, owner_id: str, device_id: str) -> O
 async def list_devices(db: AsyncSession, owner_id: str) -> list[Device]:
     result = await db.execute(select(Device).where(Device.owner_id == owner_id))
     return result.scalars().all()
-
-
-async def verify_device_token(db: AsyncSession, device_id: str, token: str) -> Optional[Device]:
-    from app.services.auth_service import verify_password as verify_pwd
-
-    result = await db.execute(select(Device).where(Device.id == device_id))
-    device = result.scalar_one_or_none()
-    if device and device.device_token_hash and verify_pwd(token, device.device_token_hash):
-        return device
-    return None

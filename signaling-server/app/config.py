@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     secret_key: str
     database_url: str = "sqlite+aiosqlite:///./signaling.db"
     access_token_expire_minutes: int = 1440
-    cors_origins: Annotated[List[str], NoDecode] = ["http://localhost:3000"]
+    cors_origins: Annotated[List[str], NoDecode] = ["http://localhost:3000", "http://127.0.0.1:3000"]
     port: int = 8000
     upload_dir: str = "uploads/avatars"
 

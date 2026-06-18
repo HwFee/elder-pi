@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.db import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, security
 from app.models import User
 from app.schemas import ContactCreate, ContactListResponse, ContactResponse, ContactUpdate
 from app.services import contact_service, upload_service
+from app.services.auth_service import decode_access_token
 
 router = APIRouter()
 
@@ -31,13 +33,27 @@ async def create_contact(
 @router.get("", response_model=ContactListResponse)
 async def list_contacts(
     device_id: str,
-    current_user: User = Depends(get_current_user),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     db: AsyncSession = Depends(get_db),
 ):
+    if credentials is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
+    payload = decode_access_token(credentials.credentials)
+    if payload is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
     try:
-        contacts = await contact_service.list_contacts(db, current_user.id, device_id)
+        if "device_id" in payload:
+            if payload["device_id"] != device_id:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+            contacts = await contact_service.list_contacts_for_device(db, device_id)
+        elif "sub" in payload:
+            contacts = await contact_service.list_contacts(db, payload["sub"], device_id)
+        else:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     except contact_service.ContactError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+
     return ContactListResponse(contacts=contacts)
 
 

@@ -49,6 +49,15 @@ async def get_contact(db: AsyncSession, owner_id: str, contact_id: str) -> Optio
     return result.scalar_one_or_none()
 
 
+async def list_contacts_for_device(db: AsyncSession, device_id: str) -> list[Contact]:
+    device_result = await db.execute(select(Device).where(Device.id == device_id))
+    device = device_result.scalar_one_or_none()
+    if device is None:
+        raise ContactError("Device not found")
+    result = await db.execute(select(Contact).where(Contact.device_id == device_id))
+    return result.scalars().all()
+
+
 async def list_contacts(db: AsyncSession, owner_id: str, device_id: str) -> list[Contact]:
     device_result = await db.execute(select(Device).where(Device.id == device_id, Device.owner_id == owner_id))
     device = device_result.scalar_one_or_none()

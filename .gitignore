@@ -20,6 +20,7 @@ build/
 .mypy_cache/
 signaling-server/signaling.db
 signaling-server/*.db
+/signaling.db
 
 # IDE
 .vscode/

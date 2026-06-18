@@ -74,6 +74,6 @@ async def health():
     return {"status": "ok"}
 
 
-sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=[])
+sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=settings.cors_origins)
 sio.register_namespace(signaling_ns)
 socket_app = socketio.ASGIApp(sio, app)

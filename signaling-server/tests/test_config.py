@@ -22,7 +22,7 @@ def test_settings_defaults(monkeypatch):
     settings = Settings()
     assert settings.database_url == "sqlite+aiosqlite:///./signaling.db"
     assert settings.access_token_expire_minutes == 1440
-    assert settings.cors_origins == ["http://localhost:3000"]
+    assert settings.cors_origins == ["http://localhost:3000", "http://127.0.0.1:3000"]
     assert settings.port == 8000
     assert settings.upload_dir == "uploads/avatars"
 

@@ -8,6 +8,13 @@
   </head>
   <body data-page="home">
     <main id="app" class="fullscreen">
+      <section id="setup-screen" class="call-screen" hidden>
+        <h1>请配置设备</h1>
+        <p>请将设备 token 写入以下文件：</p>
+        <code>~/.config/elder-pi/device-token</code>
+        <p>然后重新启动本程序。</p>
+      </section>
+
       <section id="home-screen">
         <header class="status-bar">
           <span id="status-text">正在连接…</span>

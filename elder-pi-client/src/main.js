@@ -15,6 +15,7 @@ const screens = {
   outgoing: $('#outgoing-screen'),
   incoming: $('#incoming-screen'),
   active: $('#active-screen'),
+  setup: $('#setup-screen'),
 };
 
 let deviceId = getDeviceId();
@@ -125,7 +126,7 @@ function cleanupAndHome() {
 async function bootstrap() {
   const token = getDeviceToken();
   if (!token) {
-    $('#status-text').textContent = '未配置设备 token';
+    showScreen('setup');
     return;
   }
 

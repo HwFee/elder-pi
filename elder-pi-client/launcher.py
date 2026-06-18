@@ -115,11 +115,11 @@ def main():
 
     token = args.token_file.read_text(encoding="utf-8").strip() if args.token_file.exists() else None
     if not token:
-        print(f"Device token not found at {args.token_file}")
-        print("Create it with: mkdir -p ~/.config/elder-pi && echo YOUR_TOKEN > ~/.config/elder-pi/device-token")
-        sys.exit(1)
+        print(f"WARNING: Device token not found at {args.token_file}")
+        print("The client will show a setup screen. Create the token with:")
+        print("  mkdir -p ~/.config/elder-pi && echo YOUR_TOKEN > ~/.config/elder-pi/device-token")
 
-    device_id = decode_device_id(token)
+    device_id = decode_device_id(token) if token else None
     config = {
         "deviceToken": token,
         "backendUrl": args.backend,

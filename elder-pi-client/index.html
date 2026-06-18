@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>老人视频通话</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+  </head>
+  <body data-page="home">
+    <main id="app" class="fullscreen">
+      <section id="home-screen">
+        <header class="status-bar">
+          <span id="status-text">正在连接…</span>
+        </header>
+        <div id="contacts-grid" class="contacts-grid"></div>
+      </section>
+
+      <section id="outgoing-screen" class="call-screen" hidden>
+        <h1 id="outgoing-name">正在呼叫…</h1>
+        <button id="outgoing-cancel" class="big-button danger">取消</button>
+      </section>
+
+      <section id="incoming-screen" class="call-screen" hidden>
+        <img id="incoming-avatar" alt="" hidden />
+        <h1 id="incoming-name">来电</h1>
+        <div class="incoming-actions">
+          <button id="incoming-answer" class="big-button success">接听</button>
+          <button id="incoming-decline" class="big-button danger">拒接</button>
+        </div>
+      </section>
+
+      <section id="active-screen" class="active-call" hidden>
+        <video id="remote-video" autoplay playsinline></video>
+        <video id="local-video" autoplay playsinline muted></video>
+        <div class="call-controls">
+          <button id="toggle-mic" class="control-button">静音</button>
+          <button id="toggle-camera" class="control-button">关闭摄像头</button>
+          <button id="end-call" class="control-button danger">挂断</button>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

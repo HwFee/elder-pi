@@ -105,6 +105,7 @@ def launch_kiosk(url):
 
 def main():
     parser = argparse.ArgumentParser(description="Elder Pi client launcher")
+    parser.add_argument("--host", default="127.0.0.1", help="Address to bind the static file server")
     parser.add_argument("--port", type=int, default=3000)
     parser.add_argument("--backend", default=DEFAULT_BACKEND)
     parser.add_argument("--no-kiosk", action="store_true", help="Do not launch Chromium kiosk")
@@ -133,8 +134,8 @@ def main():
         *handler_args, directory=client_dir, config=config, **handler_kwargs
     )
 
-    with socketserver.TCPServer(("127.0.0.1", args.port), handler) as httpd:
-        url = f"http://127.0.0.1:{args.port}/"
+    with socketserver.TCPServer((args.host, args.port), handler) as httpd:
+        url = f"http://{args.host}:{args.port}/"
         print(f"Serving elder-pi-client at {url}")
         print(f"Backend: {args.backend}")
         if device_id:

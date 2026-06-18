@@ -1,4 +1,5 @@
 import socketio
+from datetime import datetime
 from sqlalchemy.exc import IntegrityError, MultipleResultsFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -61,6 +62,11 @@ class SignalingNamespace(socketio.AsyncNamespace):
         device_id = session.get("device_id")
         if device_id:
             manager.heartbeat(device_id, sid)
+            async with AsyncSessionLocal() as db:
+                device = await db.get(Device, device_id)
+                if device:
+                    device.last_seen_at = datetime.utcnow()
+                    await db.commit()
 
     async def on_call_invite(self, sid, data):
         async with AsyncSessionLocal() as db:

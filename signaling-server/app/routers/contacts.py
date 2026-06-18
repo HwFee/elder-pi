@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import get_settings
 from app.db import get_db
 from app.dependencies import get_current_user, security
-from app.models import User
+from app.models import Device, User
 from app.schemas import ContactCreate, ContactListResponse, ContactResponse, ContactUpdate
 from app.services import contact_service, upload_service
 from app.services.auth_service import decode_access_token
@@ -26,6 +26,8 @@ async def create_contact(
         message = str(exc)
         if message == "Device not found":
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=message)
+        if message == "Button index already used":
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=message)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
     return contact
 
@@ -48,7 +50,12 @@ async def list_contacts(
                 raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
             contacts = await contact_service.list_contacts_for_device(db, device_id)
         elif "sub" in payload:
-            contacts = await contact_service.list_contacts(db, payload["sub"], device_id)
+            device = await db.get(Device, device_id)
+            if device is None:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Device not found")
+            if device.owner_id != payload["sub"]:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+            contacts = await contact_service.list_contacts_for_device(db, device_id)
         else:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     except contact_service.ContactError as exc:

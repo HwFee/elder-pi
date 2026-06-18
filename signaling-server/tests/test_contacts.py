@@ -53,7 +53,7 @@ async def test_create_contact_requires_unique_button_index(client, alice, bob):
     r = await client.post(f"/api/devices/{device_id}/contacts", json={
         "user_id": bob["id"], "display_name": "Bob 2", "button_index": 1
     }, headers=headers)
-    assert r.status_code == 400
+    assert r.status_code == 409
 
 
 async def test_update_contact_rejects_duplicate_button_index(client, alice, bob):

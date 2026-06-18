@@ -33,6 +33,7 @@ class Device(Base):
     # Device authentication uses JWT tokens generated on creation.
     # The device_token_hash column is retained for compatibility but is unused.
     device_token_hash = Column(String(255), nullable=True)
+    last_seen_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     owner = relationship("User", back_populates="devices")

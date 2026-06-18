@@ -86,6 +86,11 @@ class SignalingNamespace(socketio.AsyncNamespace):
                 )
                 return
 
+            active = await call_service.get_active_call_for_device(db, to_device_id)
+            if active is not None and active.call_id != call_id:
+                await self.emit("call:busy", {"callId": call_id}, room=sid)
+                return
+
             existing = await call_service.get_call_session(db, call_id)
             if existing is not None and existing.status in ("pending", "accepted"):
                 await self.emit("call:busy", {"callId": call_id}, room=sid)

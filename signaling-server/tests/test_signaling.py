@@ -333,3 +333,56 @@ async def test_ice_candidate_forwarded_to_other_party(client):
     assert ice2["room"] == manager.get_room_for_device(device_id)
     assert ice2["data"]["candidate"] == "candidate-2"
     assert ice2["skip_sid"] == "caller-sid"
+
+
+async def test_get_active_call_for_device(client):
+    from app.services import call_service
+
+    owner_id, owner_token = await _register_user(client, "owner@example.com", "secret", "Owner")
+    caller_id, caller_token = await _register_user(client, "caller@example.com", "secret", "Caller")
+    device_id, _ = await _create_device(client, owner_token)
+
+    async with AsyncSessionLocal() as db:
+        assert await call_service.get_active_call_for_device(db, device_id) is None
+
+        await call_service.create_call_session(db, "call-1", caller_id, device_id)
+        active = await call_service.get_active_call_for_device(db, device_id)
+        assert active is not None
+        assert active.call_id == "call-1"
+
+        await call_service.end_call(db, "call-1")
+        assert await call_service.get_active_call_for_device(db, device_id) is None
+
+
+async def test_second_call_returns_busy(client):
+    owner_id, owner_token = await _register_user(client, "owner@example.com", "secret", "Owner")
+    caller_id, caller_token = await _register_user(client, "caller@example.com", "secret", "Caller")
+    device_id, _ = await _create_device(client, owner_token)
+    await client.post(
+        f"/api/devices/{device_id}/contacts",
+        json={"user_id": caller_id, "display_name": "Caller", "button_index": 1},
+        headers={"Authorization": f"Bearer {owner_token}"},
+    )
+
+    ns, sessions, rooms, emitted = _make_namespace()
+    sessions["caller-sid"] = {"kind": "user", "user_id": caller_id, "caller_name": "Caller"}
+
+    await ns.on_call_invite("caller-sid", {
+        "callId": "call-1",
+        "toDeviceId": device_id,
+        "offer": {"sdp": "fake-offer"},
+    })
+
+    invite = next(e for e in emitted if e["event"] == "call:invite")
+    assert invite["data"]["callId"] == "call-1"
+
+    emitted.clear()
+    await ns.on_call_invite("caller-sid", {
+        "callId": "call-2",
+        "toDeviceId": device_id,
+        "offer": {"sdp": "fake-offer-2"},
+    })
+
+    busy = next(e for e in emitted if e["event"] == "call:busy")
+    assert busy["room"] == "caller-sid"
+    assert busy["data"]["callId"] == "call-2"

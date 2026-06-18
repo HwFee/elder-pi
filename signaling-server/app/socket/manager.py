@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 
@@ -32,6 +32,15 @@ class ConnectionManager:
 
     def get_room_for_device(self, device_id: str) -> str:
         return f"device:{device_id}"
+
+    def sweep_stale(self, timeout_seconds: int = 60):
+        cutoff = datetime.utcnow() - timedelta(seconds=timeout_seconds)
+        stale = [device_id for device_id, last_seen in self._last_seen.items() if last_seen < cutoff]
+        for device_id in stale:
+            self._device_to_sids.pop(device_id, None)
+        for device_id in stale:
+            self._last_seen.pop(device_id, None)
+        return stale
 
 
 manager = ConnectionManager()

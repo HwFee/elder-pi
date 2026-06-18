@@ -5,8 +5,9 @@ from app.db import get_db
 from app.dependencies import get_current_user
 from app.models import User
 from app.routers.contacts import router as contacts_router
-from app.schemas import DeviceCreate, DeviceResponse, DeviceTokenResponse
+from app.schemas import DeviceCreate, DeviceResponse, DeviceTokenResponse, DeviceStatusResponse
 from app.services import device_service
+from app.socket.manager import manager
 
 router = APIRouter()
 
@@ -39,6 +40,23 @@ async def get_device(
     if device is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Device not found")
     return device
+
+
+@router.get("/{device_id}/status", response_model=DeviceStatusResponse)
+async def get_device_status(
+    device_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    device = await device_service.get_owned_device(db, current_user.id, device_id)
+    if device is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Device not found")
+    manager.sweep_stale()
+    return DeviceStatusResponse(
+        device_id=device_id,
+        online=manager.is_online(device_id),
+        last_seen_at=manager.get_last_seen(device_id),
+    )
 
 
 router.include_router(contacts_router, prefix="/{device_id}/contacts")

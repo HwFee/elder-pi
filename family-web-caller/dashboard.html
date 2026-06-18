@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>设备管理</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+  </head>
+  <body data-page="dashboard">
+    <header class="top-bar">
+      <span id="user-name"></span>
+      <button id="logout">退出</button>
+    </header>
+    <main class="container">
+      <section id="devices-section">
+        <h2>我的设备</h2>
+        <ul id="device-list"></ul>
+        <form id="add-device-form">
+          <input type="text" id="device-name" placeholder="设备名称" required />
+          <button type="submit">添加设备</button>
+        </form>
+      </section>
+      <section id="contacts-section" hidden>
+        <h2>联系人</h2>
+        <ul id="contact-list"></ul>
+        <form id="contact-form">
+          <input type="hidden" id="contact-id" />
+          <input type="text" id="contact-display-name" placeholder="称呼" required />
+          <input type="number" id="contact-button-index" placeholder="按钮序号" required min="1" max="8" />
+          <button type="submit" id="contact-submit">保存联系人</button>
+        </form>
+        <form id="avatar-form">
+          <label>
+            头像
+            <input type="file" id="avatar-file" accept="image/*" />
+          </label>
+          <img id="avatar-preview" alt="头像预览" hidden />
+          <button type="submit">上传头像</button>
+        </form>
+      </section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

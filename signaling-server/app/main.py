@@ -64,6 +64,11 @@ app.include_router(devices.router, prefix="/api/devices", tags=["devices"])
 app.include_router(contacts_router, prefix="/api/contacts", tags=["contacts"])
 
 
+@app.get("/")
+async def root():
+    return {"status": "ok"}
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}

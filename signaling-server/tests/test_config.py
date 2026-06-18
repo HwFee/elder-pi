@@ -3,6 +3,7 @@ from app.config import Settings, get_settings
 
 
 def test_settings_load_from_env(monkeypatch):
+    get_settings.cache_clear()
     monkeypatch.setenv("SECRET_KEY", "test-secret")
     monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
     monkeypatch.setenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")

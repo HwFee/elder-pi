@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_db
 from app.dependencies import get_current_user
 from app.models import User
+from app.routers.contacts import router as contacts_router
 from app.schemas import DeviceCreate, DeviceResponse, DeviceTokenResponse
 from app.services import device_service
 
@@ -38,3 +39,6 @@ async def get_device(
     if device is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Device not found")
     return device
+
+
+router.include_router(contacts_router, prefix="/{device_id}/contacts")

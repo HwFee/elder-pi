@@ -35,7 +35,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
     if user is None or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     access_token = create_access_token({"sub": user.id})
-    return Token(access_token=access_token)
+    return Token(access_token=access_token, user_id=user.id)
 
 
 @router.get("/me", response_model=UserResponse)

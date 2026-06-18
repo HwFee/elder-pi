@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.routers import auth, devices
+from app.routers.contacts import api_router as contacts_router
 
 settings = get_settings()
 
@@ -18,6 +19,7 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(devices.router, prefix="/api/devices", tags=["devices"])
+app.include_router(contacts_router, prefix="/api/contacts", tags=["contacts"])
 
 
 @app.get("/health")

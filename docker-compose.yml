@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  signaling:
+    build: ./signaling-server
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./data/signaling.db}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost}
+      - PORT=8000
+    volumes:
+      - ./signaling-server/data:/app/data
+      - ./signaling-server/uploads:/app/uploads
+    restart: unless-stopped
+
+  family-web-caller:
+    build: ./family-web-caller
+    ports:
+      - "80:80"
+    depends_on:
+      - signaling
+    restart: unless-stopped

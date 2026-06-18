@@ -2,6 +2,8 @@
 comet_change: video-call-signaling
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-06-18-video-call-signaling
+status: final
 ---
 
 # video-call-signaling Design Doc

@@ -2,6 +2,7 @@
 change: video-call-signaling
 design-doc: docs/superpowers/specs/2026-06-18-video-call-signaling-design.md
 base-ref: 57ece8daaaf0edfe74dd53c75958cd86093652c8
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 # video-call-signaling Implementation Plan
@@ -26,6 +27,7 @@ base-ref: 57ece8daaaf0edfe74dd53c75958cd86093652c8
 - 每个任务以 TDD 方式执行，先写失败测试再实现，最后提交。
 - 文件路径以 `signaling-server/` 为根目录。
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ## File Structure
@@ -68,6 +70,7 @@ signaling-server/
 └── pytest.ini
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ## 阶段 1：项目脚手架
@@ -191,6 +194,7 @@ git add requirements.txt .env.example pytest.ini app/__init__.py app/config.py t
 git commit -m "chore(signaling): bootstrap project config and dependencies"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ### Task 2：数据库连接、ORM 模型与迁移脚本
@@ -342,6 +346,7 @@ git add app/db.py app/models.py tests/test_models.py
 git commit -m "feat(signaling): add database layer and ORM models"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ### Task 3：Pydantic 模式与共享依赖
@@ -511,6 +516,7 @@ git add app/schemas.py app/dependencies.py tests/test_schemas.py
 git commit -m "feat(signaling): add pydantic schemas and auth dependencies"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ## 阶段 2：用户认证
@@ -601,6 +607,7 @@ git add app/services/auth_service.py tests/test_auth_service.py
 git commit -m "feat(signaling): add password and JWT auth service"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ### Task 5：Auth 路由（注册 / 登录）
@@ -749,6 +756,7 @@ git add app/main.py app/routers/auth.py tests/test_auth.py
 git commit -m "feat(signaling): add user registration and login endpoints"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ## 阶段 3：设备与联系人管理
@@ -931,6 +939,7 @@ git add app/services/device_service.py app/routers/devices.py tests/test_devices
 git commit -m "feat(signaling): add device registration and ownership routes"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ### Task 7：联系人服务与路由
@@ -1183,6 +1192,7 @@ git add app/services/contact_service.py app/routers/contacts.py tests/test_conta
 git commit -m "feat(signaling): add contact CRUD and ownership checks"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ### Task 8：头像上传与静态文件服务
@@ -1327,6 +1337,7 @@ git add app/services/upload_service.py app/routers/contacts.py tests/test_upload
 git commit -m "feat(signaling): add avatar upload and static file serving"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ## 阶段 4：在线状态
@@ -1484,6 +1495,7 @@ git add app/socket/manager.py app/socket/namespace.py tests/test_presence.py
 git commit -m "feat(signaling): add presence manager and heartbeat handlers"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ### Task 10：设备在线状态 HTTP 端点与超时清理
@@ -1567,6 +1579,7 @@ git add app/routers/devices.py tests/test_presence.py
 git commit -m "feat(signaling): add device status endpoint and stale presence sweep"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ## 阶段 5：通话信令
@@ -1724,6 +1737,7 @@ git add app/services/device_service.py app/socket/namespace.py app/main.py tests
 git commit -m "feat(signaling): add socket.io auth for users and devices"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ### Task 12：Call 服务与信令事件转发
@@ -1988,6 +2002,7 @@ git add app/services/call_service.py app/socket/namespace.py tests/test_signalin
 git commit -m "feat(signaling): implement webrtc signaling event relay"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ### Task 13：单路通话保护与 CallSession 生命周期
@@ -2045,6 +2060,7 @@ git add app/services/call_service.py app/socket/namespace.py tests/test_signalin
 git commit -m "feat(signaling): add single active call guard"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ## 阶段 6：白名单
@@ -2150,6 +2166,7 @@ git add tests/test_whitelist.py
 git commit -m "feat(signaling): enforce contact whitelist for call invites"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ## 阶段 7：部署与文档
@@ -2241,6 +2258,7 @@ git add Dockerfile docker-compose.yml tests/test_health.py
 git commit -m "chore(signaling): add docker deployment and health check"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ### Task 16：README、Seed 脚本与事件文档
@@ -2409,6 +2427,7 @@ git add README.md scripts/seed.py docs/EVENTS.md
 git commit -m "docs(signaling): add README, seed script and event schema docs"
 ```
 
+archived-with: 2026-06-18-video-call-signaling
 ---
 
 ## Self-Review

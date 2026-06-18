@@ -8,7 +8,10 @@ function bootstrap() {
     initLogin();
   } else if (page === 'dashboard') {
     requireAuth();
-    initDashboard();
+    initDashboard().catch((err) => {
+      console.error(err);
+      window.location.href = '/index.html';
+    });
   } else if (page === 'call') {
     requireAuth();
     initCall();

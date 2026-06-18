@@ -3,17 +3,22 @@ import { getToken } from './auth.js';
 
 let socket = null;
 const handlers = {
-  invite: [],
-  accept: [],
-  reject: [],
-  end: [],
-  busy: [],
-  error: [],
-  iceCandidate: [],
+  invite: null,
+  accept: null,
+  reject: null,
+  end: null,
+  busy: null,
+  error: null,
+  iceCandidate: null,
 };
 
 export function connect() {
   if (socket?.connected) return socket;
+
+  if (socket) {
+    socket.disconnect();
+    socket.removeAllListeners?.();
+  }
 
   socket = io('/signaling', {
     auth: { token: getToken() },
@@ -35,13 +40,13 @@ export function connect() {
     console.error('signaling connect_error', err.message);
   });
 
-  socket.on('call:invite', (data) => handlers.invite.forEach((cb) => cb(data)));
-  socket.on('call:accept', (data) => handlers.accept.forEach((cb) => cb(data)));
-  socket.on('call:reject', (data) => handlers.reject.forEach((cb) => cb(data)));
-  socket.on('call:end', (data) => handlers.end.forEach((cb) => cb(data)));
-  socket.on('call:busy', (data) => handlers.busy.forEach((cb) => cb(data)));
-  socket.on('call:error', (data) => handlers.error.forEach((cb) => cb(data)));
-  socket.on('ice:candidate', (data) => handlers.iceCandidate.forEach((cb) => cb(data)));
+  socket.on('call:invite', (data) => handlers.invite?.(data));
+  socket.on('call:accept', (data) => handlers.accept?.(data));
+  socket.on('call:reject', (data) => handlers.reject?.(data));
+  socket.on('call:end', (data) => handlers.end?.(data));
+  socket.on('call:busy', (data) => handlers.busy?.(data));
+  socket.on('call:error', (data) => handlers.error?.(data));
+  socket.on('ice:candidate', (data) => handlers.iceCandidate?.(data));
 
   return socket;
 }
@@ -52,7 +57,7 @@ export function disconnect() {
     socket = null;
   }
   Object.keys(handlers).forEach((key) => {
-    handlers[key] = [];
+    handlers[key] = null;
   });
 }
 
@@ -77,29 +82,29 @@ export function emitIceCandidate(callId, candidate) {
 }
 
 export function onInvite(callback) {
-  handlers.invite.push(callback);
+  handlers.invite = callback;
 }
 
 export function onAccept(callback) {
-  handlers.accept.push(callback);
+  handlers.accept = callback;
 }
 
 export function onReject(callback) {
-  handlers.reject.push(callback);
+  handlers.reject = callback;
 }
 
 export function onEnd(callback) {
-  handlers.end.push(callback);
+  handlers.end = callback;
 }
 
 export function onBusy(callback) {
-  handlers.busy.push(callback);
+  handlers.busy = callback;
 }
 
 export function onError(callback) {
-  handlers.error.push(callback);
+  handlers.error = callback;
 }
 
 export function onIceCandidate(callback) {
-  handlers.iceCandidate.push(callback);
+  handlers.iceCandidate = callback;
 }

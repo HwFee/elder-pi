@@ -1,0 +1,16 @@
+{
+  "change": "family-web-caller",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "8522d5c5eae9e674cb879c05318492d89a100b7928f81253f6dff27df9e6c595",
+  "files": [
+    { "path": "openspec/changes/family-web-caller/proposal.md", "sha256": "cf28685ce07102ab5b1ee7cfbbe79d697a02a3b720f30ba530bc4a9fc52e7b5c" },
+    { "path": "openspec/changes/family-web-caller/design.md", "sha256": "368d195cf51852b899661cac9120a98061b2d89d937d7445a8765e98144b7ccb" },
+    { "path": "openspec/changes/family-web-caller/tasks.md", "sha256": "8f67ede4b779a6309da21894ddb042bee3c072047d499f1651b6a0049b17ae4a" },
+    { "path": "openspec/changes/family-web-caller/specs/family-auth/spec.md", "sha256": "2b92f222d041974c8d06572ed544cd54fa10562488d02d0ddc494a31ba4fe800" },
+    { "path": "openspec/changes/family-web-caller/specs/family-call-ui/spec.md", "sha256": "5610680cb6a823dadf61aa273dabfd37c4e21de2f1b522f9c07add918a47a64f" },
+    { "path": "openspec/changes/family-web-caller/specs/family-dashboard/spec.md", "sha256": "84aa426a608cfb109a9afc75341bacbe1546d57e2b15d6808e8e61ad37cd6a33" }
+  ]
+}

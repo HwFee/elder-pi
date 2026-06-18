@@ -28,6 +28,7 @@ test.describe('family-web-caller', () => {
 
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/dashboard\.html/);
-    await expect(page.locator('#device-list')).toBeVisible();
+    await expect(page.locator('#devices-section')).toBeVisible();
+    await expect(page.locator('#device-list')).toBeAttached();
   });
 });

@@ -26,19 +26,30 @@ let pc = null;
 let localStream = null;
 let callId = null;
 let remoteDeviceId = null;
-let isCaller = false;
 
 function generateCallId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
 async function getLocalStream() {
+  if (localStream) {
+    localStream.getTracks().forEach((track) => track.stop());
+    localStream = null;
+  }
   localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
   $('#local-video').srcObject = localStream;
   return localStream;
 }
 
 function createPeerConnection() {
+  if (pc) {
+    pc.onicecandidate = null;
+    pc.ontrack = null;
+    pc.onconnectionstatechange = null;
+    pc.close();
+    pc = null;
+  }
+
   pc = new RTCPeerConnection(ICE_SERVERS);
 
   pc.onicecandidate = (event) => {
@@ -59,7 +70,6 @@ function createPeerConnection() {
 }
 
 export async function startOutgoingCall(toDeviceId) {
-  isCaller = true;
   remoteDeviceId = toDeviceId;
   callId = generateCallId();
 
@@ -112,11 +122,17 @@ export function toggleCamera() {
 
 function cleanup() {
   localStream?.getTracks().forEach((track) => track.stop());
-  pc?.close();
+  if (pc) {
+    pc.onicecandidate = null;
+    pc.ontrack = null;
+    pc.onconnectionstatechange = null;
+    pc.close();
+  }
   localStream = null;
   pc = null;
   callId = null;
   remoteDeviceId = null;
+  $('#remote-video').srcObject = null;
   disconnect();
 }
 

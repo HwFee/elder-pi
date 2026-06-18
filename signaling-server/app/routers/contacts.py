@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import get_settings
 from app.db import get_db
 from app.dependencies import get_current_user
 from app.models import User
 from app.schemas import ContactCreate, ContactListResponse, ContactResponse, ContactUpdate
-from app.services import contact_service
+from app.services import contact_service, upload_service
 
 router = APIRouter()
 
@@ -62,3 +63,25 @@ async def delete_contact(
     deleted = await contact_service.delete_contact(db, current_user.id, contact_id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+
+
+@api_router.post("/{contact_id}/avatar", response_model=ContactResponse)
+async def upload_avatar(
+    contact_id: str,
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    contact = await contact_service.update_contact(
+        db, current_user.id, contact_id, ContactUpdate(avatar_path=None)
+    )
+    if contact is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+    try:
+        avatar_path = await upload_service.save_avatar(file, get_settings().upload_dir)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    contact = await contact_service.update_contact(
+        db, current_user.id, contact_id, ContactUpdate(avatar_path=avatar_path)
+    )
+    return contact

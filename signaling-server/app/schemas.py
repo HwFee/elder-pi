@@ -40,6 +40,7 @@ class DeviceResponse(BaseModel):
 class DeviceTokenResponse(BaseModel):
     device_id: str
     device_token: str
+    owner_id: str
 
 
 class ContactCreate(BaseModel):

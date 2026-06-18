@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>视频通话</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+  </head>
+  <body data-page="call">
+    <main class="call-container">
+      <div id="call-status" class="status">准备中…</div>
+      <video id="remote-video" autoplay playsinline></video>
+      <video id="local-video" autoplay playsinline muted></video>
+      <div class="call-controls">
+        <button id="toggle-mic">静音</button>
+        <button id="toggle-camera">关闭摄像头</button>
+        <button id="end-call" class="danger">结束通话</button>
+      </div>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

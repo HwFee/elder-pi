@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>家庭端登录</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+  </head>
+  <body data-page="login">
+    <main class="container">
+      <h1>家庭端视频通话</h1>
+      <form id="login-form">
+        <label>
+          邮箱
+          <input type="email" id="email" required autocomplete="email" />
+        </label>
+        <label>
+          密码
+          <input type="password" id="password" required autocomplete="current-password" />
+        </label>
+        <button type="submit">登录</button>
+        <p id="login-error" class="error" role="alert"></p>
+      </form>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

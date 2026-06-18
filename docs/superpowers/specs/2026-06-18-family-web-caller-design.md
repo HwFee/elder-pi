@@ -2,6 +2,8 @@
 comet_change: family-web-caller
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-06-18-family-web-caller
+status: final
 ---
 
 # family-web-caller Design Doc

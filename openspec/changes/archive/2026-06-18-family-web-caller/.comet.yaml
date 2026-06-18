@@ -16,6 +16,6 @@ verification_report: docs/superpowers/reports/2026-06-18-family-web-caller-verif
 branch_status: handled
 created_at: 2026-06-18
 verified_at: 2026-06-18
-archived: false
+archived: true
 handoff_context: openspec/changes/family-web-caller/.comet/handoff/design-context.json
 handoff_hash: 8522d5c5eae9e674cb879c05318492d89a100b7928f81253f6dff27df9e6c595

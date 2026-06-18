@@ -2,6 +2,7 @@
 change: family-web-caller
 design-doc: docs/superpowers/specs/2026-06-18-family-web-caller-design.md
 base-ref: 0b271f72c8e4da523310f733c8b81b5a28acfb11
+archived-with: 2026-06-18-family-web-caller
 ---
 
 # family-web-caller 实施计划
@@ -24,6 +25,7 @@ base-ref: 0b271f72c8e4da523310f733c8b81b5a28acfb11
 - 部署时 nginx 将 `/api` 和 `/socket.io` 代理到信令服务。
 - 不引入 React/Vue 等框架；不实现多路通话、聊天、屏幕共享、自托管 TURN。
 
+archived-with: 2026-06-18-family-web-caller
 ---
 
 ## 文件结构
@@ -59,6 +61,7 @@ family-web-caller/
 - `docker-compose.yml`：聚合 `signaling` 与 `family-web-caller` 服务。
 - `README.md`：项目构建与运行说明。
 
+archived-with: 2026-06-18-family-web-caller
 ---
 
 ### Task 1: 项目脚手架
@@ -363,6 +366,7 @@ git add family-web-caller
 git commit -m "chore(family-web-caller): bootstrap Vite multi-page project"
 ```
 
+archived-with: 2026-06-18-family-web-caller
 ---
 
 ### Task 2: 认证模块
@@ -550,6 +554,7 @@ git add family-web-caller/src
 git commit -m "feat(family-web-caller): add auth and API client modules"
 ```
 
+archived-with: 2026-06-18-family-web-caller
 ---
 
 ### Task 3: 仪表盘（设备与联系人管理）
@@ -808,6 +813,7 @@ git add family-web-caller/src family-web-caller/dashboard.html
 git commit -m "feat(family-web-caller): add dashboard for device and contact management"
 ```
 
+archived-with: 2026-06-18-family-web-caller
 ---
 
 ### Task 4: 信令客户端
@@ -1014,6 +1020,7 @@ git add family-web-caller/src/signaling.js family-web-caller/src/signaling.test.
 git commit -m "feat(family-web-caller): add socket.io signaling client"
 ```
 
+archived-with: 2026-06-18-family-web-caller
 ---
 
 ### Task 5: WebRTC 通话模块
@@ -1254,6 +1261,7 @@ git add family-web-caller/src/webrtc.js family-web-caller/call.html
 git commit -m "feat(family-web-caller): add WebRTC peer connection and call UI"
 ```
 
+archived-with: 2026-06-18-family-web-caller
 ---
 
 ### Task 6: 部署配置
@@ -1385,6 +1393,7 @@ git add family-web-caller/Dockerfile family-web-caller/nginx.conf docker-compose
 git commit -m "feat(family-web-caller): add nginx and Docker deployment"
 ```
 
+archived-with: 2026-06-18-family-web-caller
 ---
 
 ### Task 7: 验证
@@ -1566,6 +1575,7 @@ git add family-web-caller/tests family-web-caller/playwright.config.js family-we
 git commit -m "test(family-web-caller): add Playwright e2e tests and README"
 ```
 
+archived-with: 2026-06-18-family-web-caller
 ---
 
 ## 自审清单
@@ -1590,6 +1600,7 @@ git commit -m "test(family-web-caller): add Playwright e2e tests and README"
    - JWT 键名 `access_token` 与后端 `Token` schema 一致。
    - 联系人字段 `display_name`、`button_index` 与后端 schema 一致。
 
+archived-with: 2026-06-18-family-web-caller
 ---
 
 ## 执行交接

@@ -9,9 +9,13 @@ cd signaling-server
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env
-python -m pytest
-uvicorn app.main:socket_app --reload
+
+# 快速运行测试（不需要 .env 文件）
+SECRET_KEY=test-secret python -m pytest
+
+# 启动开发服务器前复制示例配置并修改
+# cp .env.example .env
+# uvicorn app.main:socket_app --reload
 ```
 
 ## Docker 部署

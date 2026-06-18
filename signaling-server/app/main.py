@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+import socketio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -8,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from app.config import get_settings
 from app.routers import auth, devices
 from app.routers.contacts import api_router as contacts_router
+from app.socket.namespace import signaling_ns
 
 settings = get_settings()
 
@@ -49,3 +51,8 @@ app.include_router(contacts_router, prefix="/api/contacts", tags=["contacts"])
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=[])
+sio.register_namespace(signaling_ns)
+socket_app = socketio.ASGIApp(sio, app)

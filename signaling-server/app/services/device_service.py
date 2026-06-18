@@ -5,7 +5,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Device, User
-from app.services.auth_service import hash_password
+from app.services.auth_service import create_access_token, hash_password
+
+
+def create_device_token(device_id: str) -> str:
+    return create_access_token({"device_id": device_id})
 
 
 async def create_device(db: AsyncSession, owner: User, display_name: str) -> tuple[Device, str]:
@@ -18,7 +22,7 @@ async def create_device(db: AsyncSession, owner: User, display_name: str) -> tup
     db.add(device)
     await db.commit()
     await db.refresh(device)
-    return device, device_token
+    return device, create_device_token(device.id)
 
 
 async def get_owned_device(db: AsyncSession, owner_id: str, device_id: str) -> Optional[Device]:

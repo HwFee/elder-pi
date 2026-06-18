@@ -2,7 +2,8 @@ import socketio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import AsyncSessionLocal
-from app.models import Device
+from app.models import Device, User
+from app.services.auth_service import decode_access_token
 from app.socket.manager import manager
 
 
@@ -13,12 +14,31 @@ class SignalingNamespace(socketio.AsyncNamespace):
             raise ConnectionRefusedError("Missing token")
 
         async with AsyncSessionLocal() as db:
-            device = await self._authenticate_device(db, token)
-            if device is None:
+            payload = decode_access_token(token)
+            if payload is None:
                 raise ConnectionRefusedError("Invalid token")
-            manager.connect(sid, device.id)
-            await self.enter_room(sid, manager.get_room_for_device(device.id))
-            await self.save_session(sid, {"device_id": device.id})
+
+            session = {}
+            if "device_id" in payload:
+                device = await db.get(Device, payload["device_id"])
+                if device is None:
+                    raise ConnectionRefusedError("Device not found")
+                session["device_id"] = device.id
+                session["kind"] = "device"
+            elif "sub" in payload:
+                user = await db.get(User, payload["sub"])
+                if user is None:
+                    raise ConnectionRefusedError("User not found")
+                session["user_id"] = user.id
+                session["kind"] = "user"
+            else:
+                raise ConnectionRefusedError("Invalid token claims")
+
+            await self.save_session(sid, session)
+            device_id = session.get("device_id")
+            if device_id:
+                manager.connect(sid, device_id)
+                await self.enter_room(sid, manager.get_room_for_device(device_id))
 
     async def on_disconnect(self, sid):
         manager.disconnect(sid)
@@ -28,19 +48,6 @@ class SignalingNamespace(socketio.AsyncNamespace):
         device_id = session.get("device_id")
         if device_id:
             manager.heartbeat(device_id)
-
-    async def _authenticate_device(self, db: AsyncSession, token: str):
-        from jose import jwt, JWTError
-        from app.config import get_settings
-
-        try:
-            payload = jwt.decode(token, get_settings().secret_key, algorithms=["HS256"])
-            device_id = payload.get("device_id")
-            if device_id is None:
-                return None
-            return await db.get(Device, device_id)
-        except JWTError:
-            return None
 
 
 signaling_ns = SignalingNamespace("/signaling")

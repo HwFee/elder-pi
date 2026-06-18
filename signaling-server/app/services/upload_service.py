@@ -20,4 +20,4 @@ async def save_avatar(file: UploadFile, upload_dir: str) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "wb") as f:
         f.write(contents)
-    return str(path)
+    return filename

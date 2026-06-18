@@ -4,7 +4,6 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from starlette.routing import Mount
 
 from app.config import get_settings
 from app.routers import auth, devices
@@ -13,17 +12,26 @@ from app.routers.contacts import api_router as contacts_router
 settings = get_settings()
 
 
+class UploadStaticFiles(StaticFiles):
+    def __init__(self):
+        super().__init__(directory=settings.upload_dir, check_dir=False)
+
+    async def __call__(self, scope, receive, send):
+        self.directory = get_settings().upload_dir
+        self.all_directories = self.get_directories(self.directory, self.packages)
+        self.config_checked = False
+        await super().__call__(scope, receive, send)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    fresh_settings = get_settings()
-    upload_dir = Path(fresh_settings.upload_dir)
+    upload_dir = Path(get_settings().upload_dir)
     upload_dir.mkdir(parents=True, exist_ok=True)
-    if not any(isinstance(route, Mount) and route.path == "/uploads" for route in app.routes):
-        app.mount("/uploads", StaticFiles(directory=fresh_settings.upload_dir), name="uploads")
     yield
 
 
 app = FastAPI(title="Video Call Signaling Server", lifespan=lifespan)
+app.mount("/uploads", UploadStaticFiles(), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,

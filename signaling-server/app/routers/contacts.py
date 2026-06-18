@@ -21,7 +21,10 @@ async def create_contact(
     try:
         contact = await contact_service.create_contact(db, current_user.id, device_id, payload)
     except contact_service.ContactError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+        message = str(exc)
+        if message == "Device not found":
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=message)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
     return contact
 
 
@@ -72,9 +75,7 @@ async def upload_avatar(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    contact = await contact_service.update_contact(
-        db, current_user.id, contact_id, ContactUpdate(avatar_path=None)
-    )
+    contact = await contact_service.get_contact(db, current_user.id, contact_id)
     if contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
     try:

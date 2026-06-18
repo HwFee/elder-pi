@@ -22,7 +22,6 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
-    user_id: str
 
 
 class DeviceCreate(BaseModel):
@@ -41,7 +40,6 @@ class DeviceResponse(BaseModel):
 class DeviceTokenResponse(BaseModel):
     device_id: str
     device_token: str
-    owner_id: str
 
 
 class ContactCreate(BaseModel):

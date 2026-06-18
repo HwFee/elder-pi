@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Text, Enum
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Text, Enum, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import relationship
 
@@ -39,6 +39,9 @@ class Device(Base):
 
 class Contact(Base):
     __tablename__ = "contacts"
+    __table_args__ = (
+        UniqueConstraint("device_id", "button_index", name="uq_device_button"),
+    )
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     device_id = Column(String(36), ForeignKey("devices.id"), nullable=False)

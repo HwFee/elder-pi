@@ -35,7 +35,9 @@ async def bob(client):
         "email": "bob@example.com", "password": "secret", "full_name": "Bob"
     })
     r = await client.post("/api/auth/login", data={"username": "bob@example.com", "password": "secret"})
-    return {"id": r.json()["user_id"], "token": r.json()["access_token"]}
+    token = r.json()["access_token"]
+    r = await client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    return {"id": r.json()["id"], "token": token}
 
 
 async def test_create_contact_requires_unique_button_index(client, alice, bob):

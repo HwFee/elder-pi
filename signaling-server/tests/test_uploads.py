@@ -29,13 +29,17 @@ async def test_upload_avatar(client):
         "email": "alice@example.com", "password": "secret", "full_name": "Alice"
     })
     r = await client.post("/api/auth/login", data={"username": "alice@example.com", "password": "secret"})
-    headers = {"Authorization": f"Bearer {r.json()['access_token']}"}
+    token = r.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    r = await client.get("/api/auth/me", headers=headers)
+    user_id = r.json()["id"]
 
     r = await client.post("/api/devices", json={"display_name": "Pi"}, headers=headers)
     device_id = r.json()["device_id"]
 
     r = await client.post(f"/api/devices/{device_id}/contacts", json={
-        "user_id": r.json()["owner_id"], "display_name": "Self", "button_index": 1
+        "user_id": user_id, "display_name": "Self", "button_index": 1
     }, headers=headers)
     contact_id = r.json()["id"]
 
@@ -43,3 +47,7 @@ async def test_upload_avatar(client):
     r = await client.post(f"/api/contacts/{contact_id}/avatar", files={"file": ("avatar.png", avatar, "image/png")}, headers=headers)
     assert r.status_code == 200
     assert r.json()["avatar_path"] is not None
+
+    avatar_path = r.json()["avatar_path"]
+    r = await client.get(f"/uploads/{avatar_path}", headers=headers)
+    assert r.status_code == 200

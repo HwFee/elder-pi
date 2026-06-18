@@ -18,7 +18,7 @@ async def create_device(
     db: AsyncSession = Depends(get_db),
 ):
     device, token = await device_service.create_device(db, current_user, payload.display_name)
-    return DeviceTokenResponse(device_id=device.id, device_token=token, owner_id=device.owner_id)
+    return DeviceTokenResponse(device_id=device.id, device_token=token)
 
 
 @router.get("", response_model=list[DeviceResponse])

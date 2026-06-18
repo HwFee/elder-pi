@@ -42,6 +42,13 @@ async def create_contact(
     return contact
 
 
+async def get_contact(db: AsyncSession, owner_id: str, contact_id: str) -> Optional[Contact]:
+    result = await db.execute(
+        select(Contact).join(Device).where(Contact.id == contact_id, Device.owner_id == owner_id)
+    )
+    return result.scalar_one_or_none()
+
+
 async def list_contacts(db: AsyncSession, owner_id: str, device_id: str) -> list[Contact]:
     device_result = await db.execute(select(Device).where(Device.id == device_id, Device.owner_id == owner_id))
     device = device_result.scalar_one_or_none()

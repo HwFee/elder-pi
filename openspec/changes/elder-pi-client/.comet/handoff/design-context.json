@@ -1,0 +1,17 @@
+{
+  "change": "elder-pi-client",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "5ebb352d868fd6c731035886cc2edccdf86e8f5d2267e4247467066fae308899",
+  "files": [
+    { "path": "openspec/changes/elder-pi-client/proposal.md", "sha256": "ca15666fb416c36a02b5d67ba0ec39b5b6151a6bc8c00aa111abc7a25ab7b8f5" },
+    { "path": "openspec/changes/elder-pi-client/design.md", "sha256": "55b3da81bfb23146cb3cb9e8e579392060f90dd46c4abe3c534039c252de54d5" },
+    { "path": "openspec/changes/elder-pi-client/tasks.md", "sha256": "05bafd9eeeb5f4b6e45ce7d347b6ee82b984f82a27fb6d2ec14e94c363e53b2b" },
+    { "path": "openspec/changes/elder-pi-client/specs/pi-call-session/spec.md", "sha256": "b6cf822f635e732f8082fb8e29e678c7315c41bf0eeadd7c2f6800543fbc9846" },
+    { "path": "openspec/changes/elder-pi-client/specs/pi-device-boot/spec.md", "sha256": "9eb3f77b49840da0c29544fcd0ab68a2191cd5351a75dc1ea0c3e21997d23e6c" },
+    { "path": "openspec/changes/elder-pi-client/specs/pi-home-ui/spec.md", "sha256": "0072dd3a6eb8a85d824cfa1c0d81fef483aaa2c12de85079e298c6ef355113f7" },
+    { "path": "openspec/changes/elder-pi-client/specs/pi-incoming-call/spec.md", "sha256": "8ec811d498a7fdf018abe6f595763aebf29aa2040688924ebd8db2aed82f6808" }
+  ]
+}

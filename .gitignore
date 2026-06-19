@@ -2,6 +2,12 @@
 node_modules/
 .opencode/node_modules/
 
+# Python virtual environments
+venv/
+env/
+.venv/
+ENV/
+
 # Environment
 .env
 .env.local
